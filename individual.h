@@ -15,12 +15,9 @@ public:
 	void Variation(); //变异
 private:
 	void CalculateFitness();//计算适应度
-	int NextIndex(int index);//返回下一个下标
-	bool Left(int &index);   //判断能否向左
-	bool Right(int &index);
-	bool Upper(int &index);
-	bool Down(int &index);
-	void Insert(int pos);  //插入操作
+
+	void Insert(int pos);  //插入操作			
+	
 private:
 	std::vector<int> gene;	//个体的基因(元素)
 	int	len;		//基因的长度

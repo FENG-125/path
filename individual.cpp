@@ -6,15 +6,15 @@ void Individual::create()//创建个体
 	int index = 0;
 	gene.push_back(index);//start
 
-						  //开始随机产生附近的索引并添加到gene中
+	//开始随机产生附近的索引并添加到gene中
 	int end = scene.LastIndex();
 	while (index != end)
 	{
-		int rdIndex = NextIndex(index); //-1绝路
-										//若取得的索引是障碍索引，则一直取到不是障碍为止
+		int rdIndex = scene.NextIndex(index); //-1绝路
+		//若取得的索引是障碍索引，则一直取到不是障碍为止
 		while (scene.IsObstacle(rdIndex))
 		{
-			rdIndex = NextIndex(index);
+			rdIndex = scene.NextIndex(index);
 		}
 		index = rdIndex;
 		gene.push_back(index);
@@ -166,200 +166,6 @@ void Individual::CalculateFitness() //计算并返回适应度
 	}
 }
 
-int Individual::NextIndex(int index)
-{
-	int start = index;
-	int L = scene.Length();
-	int W = scene.Width();
-	if (index == 0)    //0号索引的情况
-	{
-		int result = rand() % 2;
-		switch (result)
-		{
-		case 0:   //从右边开始判断
-		{
-			if (Right(index))
-				break;
-			else
-				Down(index);
-		}break;
-		case 1:    //从下边开始判断
-		{
-			if (Down(index))
-				break;
-			else
-				Right(index);
-		}break;
-		default: break;
-		}
-	}
-	else if (index == L - 1)  //右上角
-	{
-		int result = rand() % 2;
-		switch (result)
-		{
-		case 0:
-		{
-			if (Left(index))
-				break;
-			else
-				Down(index);
-		}break;
-		case 1:
-		{
-			if (Down(index))
-				break;
-			else
-				Left(index);
-		}break;
-		default: break;
-		}
-	}
-	else if (index == L * (W - 1))  //左下角
-	{
-		int result = rand() % 2;
-		switch (result)
-		{
-		case 0:		//右-上
-		{
-			if (Right(index))
-				break;
-			else
-				Upper(index);
-		}break;
-		case 1:
-		{
-			if (Upper(index))
-				break;
-			else
-				Right(index);
-		}
-		break;
-		default: break;
-		}
-	}
-	else if (index == scene.LastIndex()) //右下角
-	{
-		int result = rand() % 2;
-		switch (result)
-		{
-		case 0:
-		{
-			if (Left(index))
-				break;
-			else
-				Upper(index);
-		}break;
-		case 1:
-		{
-			if (Upper(index))
-				break;
-			else
-				Left(index);
-		}break;
-		default: break;
-		}
-	}
-	else
-	{	//处理一般情况
-		int result = rand() % 4;
-		switch (result)
-		{
-		case 0:  //左上右下    顺时针
-		{
-			if (Left(index))
-				break;
-			else if (Upper(index))
-				break;
-			else if (Right(index))
-				break;
-			else
-				Down(index);
-		}break;
-		case 1:
-		{
-			if (Upper(index))
-				break;
-			else if (Right(index))
-				break;
-			else if (Down(index))
-				break;
-			else
-				Left(index);
-		}break;
-		case 2:
-		{
-			if (Right(index))
-				break;
-			else if (Down(index))
-				break;
-			else if (Left(index))
-				break;
-			else
-				Upper(index);
-		}break;
-		case 3:		//从下边开始判断
-		{
-			if (Down(index))
-				break;
-			else if (Left(index))
-				break;
-			else if (Upper(index))
-				break;
-			else
-				Right(index);
-		}break;
-		default: break;
-		}
-	}
-
-	if (index == start) return -1;
-	return index;
-}
-
-bool Individual::Left(int &index)
-{
-	if (index % scene.Length() != 0) //不在最左边一列
-	{
-		if (!scene.IsObstacle(index - 1))
-		{
-			--index;
-			return true;
-		}
-	}
-	return false;
-}
-bool Individual::Right(int &index)
-{
-	if ((index + 1) % scene.Length() != 0)//不在最右边一列
-	{
-		if (!scene.IsObstacle(index + 1))
-		{
-			++index;
-			return true;
-		}
-	}
-	return false;
-}
-bool Individual::Upper(int &index)
-{
-	if (!scene.IsObstacle(index - scene.Length()))
-	{
-		index -= scene.Length();
-		return true;
-	}
-	return false;
-}
-bool Individual::Down(int &index)
-{
-	if (!scene.IsObstacle(index + scene.Length()))
-	{
-		index += scene.Length();
-		return true;
-	}
-	return false;
-}
-
 
 void Individual::Insert(int pos)  //插入操作
 {
@@ -389,7 +195,7 @@ void Individual::Insert(int pos)  //插入操作
 	{
 		//right传递的引用，所以会自动更新
 		//返回从right位置向left位置移动的索引(并不总是向left移动)
-		bool result = FindIndex(left, right, forbidAction);
+		bool result = scene.FindRoad(left, right, forbidAction);
 
 		//CheckIfBlack(left);
 		//CheckIfBlack(right);
